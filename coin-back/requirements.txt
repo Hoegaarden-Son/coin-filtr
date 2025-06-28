@@ -1,3 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
+pydantic
+sqlmodel
+sqlite-utils
 python-dotenv
+httpx
