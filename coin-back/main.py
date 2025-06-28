@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import create_db_and_tables
 
-from routers import topics, tags, favorites, youtubers, videos
+from routers import topics, tags, favorites, youtubers, videos, global_tags
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,7 +33,9 @@ app.include_router(tags.router, prefix="/tags", tags=["Tags"])
 app.include_router(favorites.router, prefix="/favorites", tags=["Favorites"])
 app.include_router(youtubers.router, prefix="/youtubers", tags=["Youtubers"])
 app.include_router(videos.router, prefix="/videos", tags=["Videos"])
+app.include_router(global_tags.router, prefix="/global-tags", tags=["Global Tags"])
 
+# 기본 엔드포인트
 @app.get("/")
 def read_root():
     return {"message": "Hello from FastAPI backend!"}
