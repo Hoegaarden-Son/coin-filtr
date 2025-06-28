@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+backenv/
+*.sqlite3
+
+# Node
+node_modules/
+.next/
+dist/
+npm-debug.log*
+
+# VSCode
+.vscode/
+.DS_Store
+
+# dotenv
+.env
