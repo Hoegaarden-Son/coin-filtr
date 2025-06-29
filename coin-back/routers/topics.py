@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from database import get_session
+from models.global_tag import GlobalTag, TopicGlobalTag
 from models.topic import Topic, TopicCreate, TopicUpdate, TopicRead
-from typing import List
+from typing import List, Optional
 
 from services.global_tag_service import assign_all_global_tags_to_topic
 from utils.slug import generate_unique_slug
@@ -11,9 +12,26 @@ router = APIRouter()
 
 
 # GET /topics/
-@router.get("/", response_model=List[Topic])
-def get_topics(session: Session = Depends(get_session)):
-    return session.exec(select(Topic)).all()
+# GET /topics?search=bitcoin&tag=DeFi
+# GET /topics?search=bitcoin → 이름/설명에 bitcoin이 포함된 토픽만
+# GET /topics?tag=Ethereum → Ethereum 글로벌 태그가 연결된 토픽만
+@router.get("/", response_model=List[TopicRead])
+def get_topics(search: Optional[str] = None,
+        tag: Optional[str] = None,
+        session: Session = Depends(get_session),
+    ):
+
+    query = select(Topic)
+    
+    if search:
+        query = query.where(Topic.name.contains(search))
+
+    if tag:
+        query = query.join(TopicGlobalTag).join(GlobalTag).where(GlobalTag.name == tag)
+
+    results = session.exec(query).all()
+    return results
+    # return session.exec(select(Topic)).all()
 
 # GET /topics/{id}
 @router.get("/{topic_id}", response_model=Topic)
