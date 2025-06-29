@@ -1,0 +1,36 @@
+노트 적어놓기로..
+
+
+
+# 25.6.29
+## SQLModel (혹은 SQLAlchemy)에서는 select(A, B)처럼 두 개 이상의 모델을 지정하면, 결과는 튜플(tuple)로 분리되어 반환
+
+stmt = select(TopicGlobalTag, GlobalTag).where(...)
+results = session.exec(stmt).all()
+
+[
+    (TopicGlobalTag(topic_id=1, global_tag_id=1, like_count=5),
+     GlobalTag(id=1, name="차트분석", description="기술적 분석")),
+     
+    (TopicGlobalTag(topic_id=1, global_tag_id=2, like_count=3),
+     GlobalTag(id=2, name="온체인", description="온체인 기반 분석"))
+]
+
+
+## SQLModel(SQLAlchemy)의 문법 규칙
+
+foreign_key="topic.id"
+- "topic": 참조하는 테이블 이름 (자동 소문자화 됨)
+- "id": 그 테이블의 참조 대상 컬럼
+- "topic.id": 결국 topic 테이블의 id 컬럼을 외래키로 사용한다는 뜻
+
+
+## Migration
+- Alembic은 SQLModel/SQLAlchemy 기반 프로젝트에서 DB 스키마 변경을 버전 관리할 수 있게 해주는 도구
+- alembic init alembic 초기화 (alembic 디렉토리 생성)
+- 1) 변경 사항 감지해서 마이그레이션 파일 생성
+    alembic revision --autogenerate -m "add slug to topic"
+- 2) 마이그레이션 실행 (DB 반영)
+    alembic upgrade head
+    
+- option) alembic stamp head #  "이미 최신이야!"

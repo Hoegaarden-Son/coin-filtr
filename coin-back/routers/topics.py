@@ -1,18 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from database import get_session
-from models.topic import Topic, TopicCreate, TopicUpdate
+from models.topic import Topic, TopicCreate, TopicUpdate, TopicRead
 from typing import List
 
 from services.global_tag_service import assign_all_global_tags_to_topic
+from utils.slug import generate_unique_slug
 
 router = APIRouter()
-
-# 더미 데이터
-# topics = [
-#     Topic(id=1, name="비트코인", description="대표적인 암호화폐"),
-#     Topic(id=2, name="이더리움", description="스마트 계약 플랫폼"),
-# ]
 
 
 # GET /topics/
@@ -29,10 +24,18 @@ def get_topic(topic_id: int, session: Session = Depends(get_session)):
     return topic
 
 # POST /topics/
-@router.post("/", response_model=Topic)
-def create_topic(topic: Topic, session: Session = Depends(get_session)):
-    topic_obj = Topic.model_validate(topic)
+@router.post("/", response_model=TopicRead)
+def create_topic(topic: TopicCreate, session: Session = Depends(get_session)):
+    # ✅ 슬러그 자동 생성
+    slug = generate_unique_slug(topic.name, session)
+    
+    topic_obj = Topic(
+        name=topic.name,
+        description=topic.description,
+        slug=slug
+    )
 
+    # ✅ DB에 저장
     session.add(topic_obj)
     session.commit()
     session.refresh(topic_obj)
@@ -63,3 +66,11 @@ def delete_topic(topic_id: int, session: Session = Depends(get_session)):
     session.delete(topic)
     session.commit()
     return {"message": "Topic deleted"}
+
+
+@router.get("/slug/{slug}", response_model=Topic)
+def get_topic_by_slug(slug: str, session: Session = Depends(get_session)):
+    topic = session.exec(select(Topic).where(Topic.slug == slug)).first()
+    if not topic:
+        raise HTTPException(status_code=404, detail="Topic not found")
+    return topic

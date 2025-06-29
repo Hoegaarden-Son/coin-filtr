@@ -5,3 +5,5 @@ sqlmodel
 sqlite-utils
 python-dotenv
 httpx
+python-slugify
+alembic
