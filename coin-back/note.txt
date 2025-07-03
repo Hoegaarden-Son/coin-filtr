@@ -34,3 +34,13 @@ foreign_key="topic.id"
     alembic upgrade head
     
 - option) alembic stamp head #  "이미 최신이야!"
+
+
+
+## 25.7.4.
+- 현재 back 로컬 에러: /favorites-topics/ HTTP/1.1" 400 Bad Request
+- 현재 front 에러 : e "/topics/[slug]" used `params.slug`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at TopicDetailPage (src/app/topics/[slug]/page.tsx:19:60)
+
+- 즐겨찾기 기능 등 추가했으나,.. 버튼 이 enable/disable 스위칭 및 저장하려고하니 오류발생중
+- 다음에 이어서...
